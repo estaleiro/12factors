@@ -3,6 +3,7 @@ package factors
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/bradfitz/gomemcache/memcache"
 	gsm "github.com/bradleypeabody/gorilla-sessions-memcache"
@@ -10,6 +11,11 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+/*
+Factor 6 program
+Please, install Memcached in some machine, and export an environment variable called MEMCACHE_HOST
+with the value HOST:PORT before starting the program.
+*/
 var err error
 
 func incrementaContador(sessao *sessions.Session, w http.ResponseWriter, r *http.Request) int {
@@ -33,7 +39,12 @@ func sessaoFS(r *http.Request) (sessao *sessions.Session, err error) {
 }
 
 func sessaoMC(r *http.Request) (sessao *sessions.Session, err error) {
-	memcacheClient := memcache.New("localhost:11211")
+	var memcacheHost string
+	if memcacheHost = os.Getenv("MEMCACHE_HOST"); memcacheHost == "" {
+		memcacheHost = "localhost:11211"
+	}
+
+	memcacheClient := memcache.New(memcacheHost)
 	storeMC := gsm.NewMemcacheStore(memcacheClient, "session_prefix_", []byte("secret-key-goes-here"))
 	sessao, _ = storeMC.Get(r, "sessaoMC")
 	return sessao, err
