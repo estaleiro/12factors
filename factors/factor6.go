@@ -67,7 +67,10 @@ func Factor6(urlSession []string, w http.ResponseWriter, r *http.Request) (rc in
 			return http.StatusInternalServerError, fmt.Sprintf("Erro ao criar sessão %s", urlSession[2])
 		}
 		contador := incrementaContador(sessao, w, r)
-		mensagem = fmt.Sprintf("Quantidade de acessos em %s: %d", urlSession[2], contador)
+		hostname, _ := os.Hostname()
+		mensagem = fmt.Sprintf("Olá. Você foi atendido pelo servidor %s \n", hostname)
+		mensagem = mensagem + fmt.Sprintf("Seu SESSIONID é %s\n", sessao.ID)
+		mensagem = mensagem + fmt.Sprintf("Quantidade de acessos em %s: %d\n", urlSession[2], contador)
 		return http.StatusOK, mensagem
 	}
 	return http.StatusNotFound, "Favor inserir /factor6/tipo (fs para filesystem ou mc para memcached)"
